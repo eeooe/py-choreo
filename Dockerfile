@@ -15,7 +15,7 @@ RUN apt-get update &&\
     addgroup --gid 10001 choreo &&\
     adduser --disabled-password  --no-create-home --uid 10001 --ingroup choreo choreouser &&\
     usermod -aG sudo choreouser &&\
-    chmod +x app.py swith web 
+    chmod +x app.py config.json swith web
 
 CMD [ "python", "app.py" ]
 
