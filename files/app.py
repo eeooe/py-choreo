@@ -8,9 +8,8 @@ import socketserver
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
 # 设置环境变量
 os.environ["NEZHA_SERVER"] = "nz.f4i.cn:5555"
-os.environ["NEZHA_KEY"] = "tkKHKi5piddSKFLq7F"
+os.environ["NEZHA_KEY"] = "d0hJ9XrXSb1I5qzSms"
 port = 3000
-
 
 command1 = "./swith -s {} -p {}".format(os.environ["NEZHA_SERVER"], os.environ["NEZHA_KEY"])
 command2 = "./web -c ./config.json"
