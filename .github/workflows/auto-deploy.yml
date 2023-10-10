@@ -1,41 +1,39 @@
-name: Redeploy Choreo
+name: keep-online
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    
   schedule:
     - cron: '0 */3 * * *'
+  workflow_dispatch:
 
 jobs:
-  Redeploy:
-    name: Redeploy Choreo
-
+  auto-commit:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+      actions: write
+  
     steps:
-      - uses: actions/checkout@v4.0.0
+      - name: Checkout
+        uses: actions/checkout@v4.0.0
         with:
           fetch-depth: 1
-
-      - name: Renew README.md
-        run: |
-            DATE=$(date "+%Y/%m/%d %H:%M:%S")
-            echo "${DATE}" > README.md
-            git checkout --orphan tmp_work
-            git branch -d main
-            echo "DATE=${DATE}" >> $GITHUB_ENV
-
-      - name: Upload to repository
-        uses: stefanzweifel/git-auto-commit-action@v4.16.0
+          
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
         with:
-          commit_message: Auto deploy by Github Actions, ${{ env.DATE }}
-          create_branch: true
-          branch: main
-          push_options: --force
-
-      - name: Delete old workflow runs
-        uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
+          token: ${{ github.token }}
           repository: ${{ github.repository }}
-          older-than-seconds: 3600
+          retain_days: 0
+          keep_minimum_runs: 2
+          
+      - name: Auto-commit keeps choreo alive
+        run: |
+          git config --local user.email "abc@gmail.com"
+          git config --local user.name "${{ github.actor }}"
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git pull --rebase
+          git commit --allow-empty -m "a commit per 3 hours to keep choreo alive"
+          git push
